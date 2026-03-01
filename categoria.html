@@ -1120,12 +1120,10 @@
       </a>`;
     }).join('');
 
-    // Scroll active pill flush to the left content edge (matching strip's 24px padding-left)
+    // Scroll active pill flush to the left content edge before first paint
     const activePill = strip.querySelector('.mobile-cat-btn.active');
     if (activePill) {
-      requestAnimationFrame(() => {
-        strip.scrollLeft = activePill.offsetLeft - 24;
-      });
+      strip.scrollLeft = activePill.offsetLeft - 24;
     }
   }
   buildMobileStrip();

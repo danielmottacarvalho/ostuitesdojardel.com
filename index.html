@@ -614,20 +614,18 @@
       cursor: zoom-in;
       display: block;
       min-height: auto;
+      overflow: hidden;
     }
     .tweet-img-btn img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      aspect-ratio: auto;
-      min-height: 160px;
-      max-height: 480px;
+      aspect-ratio: 16 / 9;
     }
     .tweet-images.single .tweet-img-btn img {
-      max-height: 520px;
-      object-fit: contain;
-      background: var(--grey-100, #f0ede9);
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
     }
 
     /* ── Lightbox ─────────────────────────────────────────── */

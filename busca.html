@@ -284,18 +284,23 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 88px 24px;
-      background: var(--white);
-      border-radius: 16px;
-      margin-top: 24px;
+      gap: 32px;
+      padding: 72px 24px 104px;
       text-align: center;
     }
     .no-results.visible { display: flex; }
-    .no-results-title { font-family: var(--font-display); font-size: 32px; font-weight: 400; color: var(--grey-900); }
-    .no-results-text { font-size: 18px; color: var(--grey-600); max-width: 480px; }
-    .no-results-link { margin-top: 8px; font-size: 16px; font-weight: 500; color: var(--blue); text-decoration: none; }
-    .no-results-link:hover { text-decoration: underline; }
+    .no-results-photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; display: block; }
+    .no-results-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .no-results-title { font-family: var(--font-display); font-size: 56px; font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; color: var(--grey-900); }
+    .no-results-text { font-size: 18px; color: var(--grey-600); max-width: 480px; line-height: 1.5; }
+    .no-results-link {
+      margin-top: 16px; display: inline-flex; align-items: center;
+      padding: 12px 32px; background: var(--blue-bg); border-radius: 9999px;
+      border: 1px solid var(--blue); font-family: var(--font-body);
+      font-size: 16px; font-weight: 500; color: var(--blue);
+      text-decoration: none; transition: background 0.15s, color 0.15s;
+    }
+    .no-results-link:hover { background: var(--blue); color: #fff; }
 
     /* Lightbox */
     .lb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9000; align-items: center; justify-content: center; }
@@ -453,9 +458,12 @@
     </div>
 
     <div class="no-results" id="no-results">
-      <p class="no-results-title">Jardel não passou por aqui</p>
-      <p class="no-results-text">Nenhum tuíte encontrado para esta busca. O Jards era prolífico, mas ninguém é perfeito.</p>
-      <a href="index.html" class="no-results-link">← Voltar e tentar de novo</a>
+      <img src="images/jardel-top.png" alt="Jardel Sebba" class="no-results-photo">
+      <div class="no-results-content">
+        <h1 class="no-results-title">Dessa o Jardel escapou</h1>
+        <p class="no-results-text">Nenhum tweet encontrado. Como ele diria: nem tudo merece uma opinião.</p>
+        <a href="index.html" class="no-results-link">Me tira dessa</a>
+      </div>
     </div>
   </div>
 
@@ -567,6 +575,8 @@
 
     if (allResults.length === 0) {
       document.getElementById('no-results').classList.add('visible');
+      document.getElementById('busca-title').style.display = 'none';
+      document.querySelector('.back-link').style.display = 'none';
     } else {
       document.getElementById('results-toolbar').style.display = '';
       document.getElementById('tweet-count').textContent =
@@ -574,7 +584,8 @@
       renderResults();
     }
   } else {
-    document.getElementById('busca-title').textContent = 'Busca';
+    document.getElementById('busca-title').style.display = 'none';
+    document.querySelector('.back-link').style.display = 'none';
     document.getElementById('no-results').classList.add('visible');
   }
 

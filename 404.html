@@ -198,6 +198,8 @@
     @media (max-width: 767px) {
       :root { --header-h: 80px; }
       a { min-height: 48px; display: inline-flex; align-items: center; }
+      /* Body/content links must stay inline — no forced line breaks */
+      p a { display: inline; min-height: 0; width: auto; white-space: normal; }
       .header { padding: 16px 24px; }
       .nav { display: none; }
       .hamburger { display: flex; }

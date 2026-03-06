@@ -80,8 +80,20 @@
       background: none; border: none; cursor: pointer; padding: 0;
       font-family: var(--font-body);
     }
+    .nav a, .nav-cat-trigger { position: relative; }
     .nav a:hover, .nav-cat-trigger:hover,
-    .nav a.active, .nav-cat-trigger.active { font-weight: 700; }
+    .nav a.active, .nav-cat-trigger.active { font-weight: 400; text-decoration: none; }
+    .nav a::after, .nav-cat-trigger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -16px;
+      width: 100%;
+      height: 1px;
+      background: transparent;
+    }
+    .nav a:hover::after, .nav-cat-trigger:hover::after { background: #757575; }
+    .nav a.active::after, .nav-cat-trigger.active::after { background: #212121; }
 
     /* Hamburger */
     .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 32px; height: 32px; cursor: pointer; }
@@ -155,7 +167,7 @@
       line-height: 1.1;
       letter-spacing: -0.02em;
       color: var(--grey-900);
-      text-align: center;
+      text-align: left;
       margin-bottom: 8px;
     }
 
@@ -164,7 +176,7 @@
       font-size: 16px;
       font-weight: 400;
       color: var(--grey-600);
-      text-align: center;
+      text-align: left;
     }
 
     /* ── Photo blocks ── */
@@ -232,6 +244,8 @@
     @media (max-width: 767px) {
       :root { --header-h: 80px; }
       a { min-height: 48px; display: inline-flex; align-items: center; }
+      /* Body/content links must stay inline — no forced line breaks */
+      .sobre-body a, p a { display: inline; min-height: 0; width: auto; }
       .header { padding: 16px 24px; }
       .nav { display: none; }
       .hamburger { display: flex; }
@@ -474,27 +488,42 @@
   /* ── Mega menu ── */
   const navTrigger = document.getElementById('nav-cat-trigger');
   const megaMenu   = document.getElementById('mega-menu');
+  let megaTimeout;
   let megaIsOpen   = false;
 
   function openMega() {
+    clearTimeout(megaTimeout);
+    megaIsOpen = true;
     megaMenu.classList.add('open');
     navTrigger.setAttribute('aria-expanded', 'true');
     navTrigger.classList.add('active');
-    megaIsOpen = true;
   }
-  function closeMega(returnFocus) {
-    megaMenu.classList.remove('open');
-    navTrigger.setAttribute('aria-expanded', 'false');
-    navTrigger.classList.remove('active');
-    megaIsOpen = false;
-    if (returnFocus) navTrigger.focus();
+  function closeMega(immediate) {
+    const doClose = () => {
+      megaIsOpen = false;
+      megaMenu.classList.remove('open');
+      navTrigger.setAttribute('aria-expanded', 'false');
+      navTrigger.classList.remove('active');
+    };
+    if (immediate) { clearTimeout(megaTimeout); doClose(); }
+    else { megaTimeout = setTimeout(doClose, 120); }
   }
 
-  navTrigger.addEventListener('click', () => { megaIsOpen ? closeMega(false) : openMega(); });
-  document.addEventListener('click', e => {
-    if (megaIsOpen && !megaMenu.contains(e.target) && !navTrigger.contains(e.target)) closeMega(false);
+  navTrigger.addEventListener('mouseenter', openMega);
+  navTrigger.addEventListener('mouseleave', () => closeMega(false));
+  megaMenu.addEventListener('mouseenter', openMega);
+  megaMenu.addEventListener('mouseleave', () => closeMega(false));
+
+  navTrigger.addEventListener('click', e => {
+    e.stopPropagation();
+    megaIsOpen ? closeMega(true) : openMega();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && megaIsOpen) closeMega(true); });
+  document.addEventListener('click', e => {
+    if (megaIsOpen && !megaMenu.contains(e.target) && e.target !== navTrigger) closeMega(true);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && megaIsOpen) { closeMega(true); navTrigger.focus(); }
+  });
 </script>
 
 </body>

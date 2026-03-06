@@ -103,8 +103,20 @@
       padding: 0;
       font-family: var(--font-body);
     }
+    .nav a, .nav-cat-trigger { position: relative; }
     .nav a:hover, .nav-cat-trigger:hover,
-    .nav a.active, .nav-cat-trigger.active { font-weight: 700; text-decoration: none; }
+    .nav a.active, .nav-cat-trigger.active { font-weight: 400; text-decoration: none; }
+    .nav a::after, .nav-cat-trigger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -16px;
+      width: 100%;
+      height: 1px;
+      background: transparent;
+    }
+    .nav a:hover::after, .nav-cat-trigger:hover::after { background: #757575; }
+    .nav a.active::after, .nav-cat-trigger.active::after { background: #212121; }
 
     /* ── Mega menu ────────────────────────────────────────── */
     .mega-menu {
@@ -833,6 +845,8 @@
     @media (max-width: 767px) {
       /* Touch targets */
       a { min-height: 48px; display: inline-flex; align-items: center; }
+      /* Content/body links must stay inline — no forced line breaks */
+      .tweet-text a, .tweet-link, p a { display: inline; min-height: 0; width: auto; }
 
       /* Header */
       :root { --header-h: 80px; }
@@ -1060,6 +1074,7 @@
             <p class="no-results-title">Ué, não tem nada aqui...</p>
             <p class="no-results-text">Sua busca não deu resultados. É frustrante, sabemos. Jardel sempre se sentia assim tentando convencer alguém de que Paulo Leminski não é o que eles pensam que é.</p>
           </div>
+          <button class="btn-load-more" id="btn-limpar-busca" type="button">Limpar busca</button>
         </div>
         <div class="load-more-wrap">
           <button class="btn-load-more hidden" id="btn-search-more">Carregar mais</button>
@@ -1383,15 +1398,48 @@
     document.getElementById('mobile-search').value = '';
   }
 
+  /* ── Category page detection ────────────────────────────── */
+  const isCategoryPage =
+    window.location.pathname.includes('categoria') ||
+    new URLSearchParams(window.location.search).has('cat');
+
+  /* ── Save scroll before search (category pages only) ────── */
+  function saveScrollIfCategory() {
+    if (isCategoryPage) {
+      sessionStorage.setItem('preSearchScrollY', String(window.scrollY));
+    }
+  }
+
+  /* ── "Limpar busca" button ───────────────────────────────── */
+  document.getElementById('btn-limpar-busca').addEventListener('click', () => {
+    document.getElementById('sidebar-search').value = '';
+    document.getElementById('mobile-search').value  = '';
+    showBrowse();
+    if (isCategoryPage) {
+      const pos = parseInt(sessionStorage.getItem('preSearchScrollY') || '0', 10);
+      requestAnimationFrame(() => { window.scrollTo(0, pos); });
+    }
+  });
+
   /* ── Sidebar search wiring ──────────────────────────────── */
   const sidebarInput = document.getElementById('sidebar-search');
-  document.getElementById('sidebar-search-btn').addEventListener('click', () => runSearch(sidebarInput.value));
-  sidebarInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(sidebarInput.value); });
+  document.getElementById('sidebar-search-btn').addEventListener('click', () => {
+    saveScrollIfCategory();
+    runSearch(sidebarInput.value);
+  });
+  sidebarInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { saveScrollIfCategory(); runSearch(sidebarInput.value); }
+  });
 
   /* ── Mobile search wiring ───────────────────────────────── */
   const mobileInput = document.getElementById('mobile-search');
-  document.getElementById('mobile-search-btn').addEventListener('click', () => runSearch(mobileInput.value));
-  mobileInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(mobileInput.value); });
+  document.getElementById('mobile-search-btn').addEventListener('click', () => {
+    saveScrollIfCategory();
+    runSearch(mobileInput.value);
+  });
+  mobileInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { saveScrollIfCategory(); runSearch(mobileInput.value); }
+  });
 
 
   /* ── Hamburger / Mobile Overlay ─────────────────────────── */
